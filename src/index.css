@@ -66,7 +66,6 @@ code {
   padding: 7px;
   background-color: #FFF;
   border-radius: 50%;
-  border: none;
   text-align: center;
   width: 34px;
   height: 34px;
@@ -147,4 +146,8 @@ code {
   display: flex;
   align-items: center;
   justify-content: center;
+}.day.lowPercentage {
+  border: #FF9D43 1px solid; /* Змініть колір бордера, коли відсоток менший за 100 */
 }
+
+

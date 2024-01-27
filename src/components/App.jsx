@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 const Calendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const getCurrentDate = () => new Date();
+
+  const [currentDate, setCurrentDate] = useState(getCurrentDate());
   const [selectedDay, setSelectedDay] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
-  const [shouldReopenModal, setShouldReopenModal] = useState(false);
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -20,24 +21,34 @@ const Calendar = () => {
     return daysArray;
   };
 
+  const isCurrentMonth = () => {
+    const currentDateStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const currentDateEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    const today = getCurrentDate();
+
+    return today >= currentDateStart && today <= currentDateEnd;
+  };
+
   const handlePrevMonth = () => {
     setCurrentDate((prevDate) => new Date(prevDate.getFullYear(), prevDate.getMonth() - 1));
     setSelectedDay(null);
   };
 
   const handleNextMonth = () => {
-    setCurrentDate((prevDate) => new Date(prevDate.getFullYear(), prevDate.getMonth() + 1));
-    setSelectedDay(null);
+    const nextMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
+    if (nextMonthDate <= getCurrentDate()) {
+      setCurrentDate(nextMonthDate);
+      setSelectedDay(null);
+    }
   };
 
   const closeAndReopenModal = () => {
     closeModal();
-    setShouldReopenModal(true);
   };
 
   const handleDayClick = (day) => {
     const dayElement = document.getElementById(`day-${day.day}`);
-    
+  
     if (!dayElement) {
       console.error(`Element with id 'day-${day.day}' not found.`);
       return;
@@ -47,26 +58,22 @@ const Calendar = () => {
     const modalWidth = 292;
     const modalHeight = 188;
   
-    const modalTop = dayElementRect.top - modalHeight - 40; 
+    const modalTop = dayElementRect.top - modalHeight - 40;
     const modalLeft = dayElementRect.left + dayElementRect.width / 2 - modalWidth / 2;
   
-    if (selectedDay === day.day) {
-      closeAndReopenModal();
+    if (selectedDay === day.day && isModalOpen) {
+      closeModal();
     } else {
       setSelectedDay(day.day);
       setModalContent(day);
-
+  
       document.documentElement.style.setProperty('--modal-top', `${modalTop}px`);
       document.documentElement.style.setProperty('--modal-left', `${modalLeft}px`);
-      
-      if (shouldReopenModal) {
-        setIsModalOpen(true);
-        setShouldReopenModal(false);
-      } else {
-        setIsModalOpen(true);
-      }
+  
+      setIsModalOpen(true);
     }
   };
+  
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -85,7 +92,6 @@ const Calendar = () => {
       closeModal();
     }
   };
-  
 
   useEffect(() => {
     window.addEventListener('keydown', handleEscapeKey);
@@ -101,6 +107,11 @@ const Calendar = () => {
     };
   }, []);
 
+  const calculatePercentage = (day) => {
+    const percentage = 100;
+    return percentage;
+  };
+
   return (
     <div className="calendar">
       <div className="header">
@@ -109,19 +120,21 @@ const Calendar = () => {
           <h2 className='month-title'>
             {currentDate.toLocaleString('en-US', { month: 'long' })}, {currentDate.getFullYear()}
           </h2>
-          <button onClick={handleNextMonth} className='button'>&gt;</button>
+          {!isCurrentMonth() && (
+            <button onClick={handleNextMonth} className='button'>&gt;</button>
+          )}
         </div>
       </div>
       <div className="days">
         {getDaysInMonth(currentDate).map((day) => (
           <div key={day.day} id={`day-${day.day}`}>
             <div
-              className={`day ${selectedDay === day.day ? 'selected' : ''}`}
+              className={`day ${selectedDay === day.day ? 'selected' : ''} ${calculatePercentage(day) < 100 ? 'lowPercentage' : ''}`}
               onClick={() => handleDayClick(day)}
             >
               {day.day}
             </div>
-            <h1 className='procent'>100%</h1>
+            <h1 className={`procent ${calculatePercentage(day) < 100 ? 'lowPercentage' : ''}`}>{`${calculatePercentage(day)}%`}</h1>
           </div>
         ))}
       </div>
