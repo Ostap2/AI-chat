@@ -48,7 +48,7 @@ const Calendar = () => {
 
   const handleDayClick = (day) => {
     const dayElement = document.getElementById(`day-${day.day}`);
-  
+    
     if (!dayElement) {
       console.error(`Element with id 'day-${day.day}' not found.`);
       return;
@@ -58,22 +58,21 @@ const Calendar = () => {
     const modalWidth = 292;
     const modalHeight = 188;
   
-    const modalTop = dayElementRect.top - modalHeight - 40;
+    const modalTop = dayElementRect.top - modalHeight - 40; 
     const modalLeft = dayElementRect.left + dayElementRect.width / 2 - modalWidth / 2;
   
-    if (selectedDay === day.day && isModalOpen) {
-      closeModal();
+    if (selectedDay === day.day) {
+      closeAndReopenModal();
     } else {
       setSelectedDay(day.day);
       setModalContent(day);
-  
+
       document.documentElement.style.setProperty('--modal-top', `${modalTop}px`);
       document.documentElement.style.setProperty('--modal-left', `${modalLeft}px`);
-  
+      
       setIsModalOpen(true);
     }
   };
-  
 
   const closeModal = () => {
     setIsModalOpen(false);
